@@ -8,21 +8,40 @@
 
 import UIKit
 import AFNetworking
+import EZLoadingActivity
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UICollectionViewDataSource {
 
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var collectionView: UICollectionView!
     
     // Instance Variables
-    var movies: [NSDictionary]?
+    var movies: [NSDictionary]!
+    var refreshControl: UIRefreshControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        tableView.dataSource = self
-        tableView.delegate = self
         // Do any additional setup after loading the view.
         
+        collectionView.dataSource = self
+        
+        EZLoadingActivity.show("Loading...", disableUI: true)
+        fetchData()
+        delay(0.50,closure: {EZLoadingActivity.hide()})
+        
+        refreshControl = UIRefreshControl()
+        self.collectionView.addSubview(self.refreshControl)
+        self.refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
+
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+         //delay present for demonstration purposes
+        
+    }
+    
+    
+    func fetchData () {
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
         let request = NSURLRequest(URL: url!)
@@ -37,21 +56,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 if let data = dataOrNil {
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
-                            NSLog("\n\nresponse: \(responseDictionary)")
+                            //NSLog("\n\nresponse: \(responseDictionary)")
                             
-                            self.movies = responseDictionary["results"] as! [NSDictionary]
-                            self.tableView.reloadData()
+                            self.movies = (responseDictionary["results"] as! [NSDictionary])
+                            self.collectionView.reloadData()
                             
                     }
                 }
         });
         task.resume()
-        
-        
-        
-        
-        
-        
         
     }
 
@@ -60,9 +73,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Dispose of any resources that can be recreated.
     }
 
-    
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let movies = movies {
             return movies.count
             
@@ -71,38 +82,80 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             
         }
     }
-
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath:  indexPath) as! MovieCell
+    
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
         let movie = movies![indexPath.row]
         let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
         let baseURL = "http://image.tmdb.org/t/p/w500"
-        let posterPath = movie["poster_path"] as! String
         
-        let imageURL = NSURL(string: baseURL + posterPath)
-        
-        
+        if let posterPath = movie["poster_path"] as? String {
+            let imageURL = NSURL(string: baseURL + posterPath)
+            cell.posterImage.setImageWithURL((imageURL)!)
+        }
         cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
-        cell.posterView.setImageWithURL(imageURL!)
         
         
-        NSLog("row \(indexPath.row)")
         return cell
+    }
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        print("Selected cell number: \(indexPath.row)")
+        
+        let detailMovieViewController = DetailMovieViewController()
+        
+        detailMovieViewController.performSegueWithIdentifier("DetailMovie", sender: self)
+    }
+    
+    func delay(delay:Double, closure:()->()) {
+        dispatch_after(
+            dispatch_time(
+                DISPATCH_TIME_NOW,
+                Int64(delay * Double(NSEC_PER_SEC))
+            ),
+            dispatch_get_main_queue(), closure)
+    }
+    
+    func onRefresh() {
+        delay(2, closure: {
+            self.fetchData()
+            self.refreshControl.endRefreshing()
+        })
         
     }
     
-    
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        
+        if let indexPath = getIndexPathOfSelectedCell() {
+            let movie = movies![indexPath.row]
+            let title = movie["title"] as! String
+            let overview = movie["overview"] as! String
+            let baseURL = "http://image.tmdb.org/t/p/w500"
+            
+            if segue.identifier == "DetailMovie" {
+                let detailMovieViewController = segue.destinationViewController as! DetailMovieViewController
+                detailMovieViewController.movieTitle = title
+                detailMovieViewController.overview = overview
+                
+                if let posterPath = movie["poster_path"] as? String {
+                    let imageURL = NSURL(string: baseURL + posterPath)
+                    detailMovieViewController.posterImageURL = imageURL!
+                }
+                print(title)
+                print(indexPath)
+            }
+        }
     }
-    */
-
+    
+    func getIndexPathOfSelectedCell() -> NSIndexPath? {
+        
+        var indexPath:NSIndexPath?
+        
+        if collectionView.indexPathsForSelectedItems()?.count > 0 {
+            indexPath = collectionView.indexPathsForSelectedItems()![0]
+            
+        }
+        return indexPath
+        
+    }
 }
