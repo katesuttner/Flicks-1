@@ -14,11 +14,20 @@ PODS:
   - AFNetworking/Serialization (3.0.4)
   - AFNetworking/UIKit (3.0.4):
     - AFNetworking/NSURLSession
+  - Bolts/Tasks (1.5.1)
+  - EZLoadingActivity (0.7)
+  - Parse (1.12.0):
+    - Bolts/Tasks (~> 1.5)
 
 DEPENDENCIES:
   - AFNetworking
+  - EZLoadingActivity
+  - Parse
 
 SPEC CHECKSUMS:
   AFNetworking: a0075feb321559dc78d9d85b55d11caa19eabb93
+  Bolts: a12663244b1d3351c738882e71902fc74db54f64
+  EZLoadingActivity: d0450022cfcec79e079d037af922a728828f4b80
+  Parse: de2c52a9a1421b91ae7594ab8ce191afd184f19b
 
 COCOAPODS: 0.39.0

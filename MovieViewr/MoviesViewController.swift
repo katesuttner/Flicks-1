@@ -9,14 +9,16 @@
 import UIKit
 import AFNetworking
 import EZLoadingActivity
+import Parse
 
-class MoviesViewController: UIViewController, UICollectionViewDataSource {
+class MoviesViewController: UIViewController, UICollectionViewDataSource, UISearchBarDelegate {
 
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var searchBar: UISearchBar!
     
     // Instance Variables
     var movies: [NSDictionary]!
+    var filteredData: [NSDictionary]!
     var refreshControl: UIRefreshControl!
     
     override func viewDidLoad() {
@@ -26,6 +28,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource {
         self.searchBar.barTintColor = UIColor.blackColor()
         navigationController?.navigationBar.barStyle = UIBarStyle.BlackOpaque
         collectionView.dataSource = self
+        searchBar.delegate = self
         
         EZLoadingActivity.show("Loading...", disableUI: true)
         fetchData()
@@ -45,6 +48,15 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource {
     
     
     func fetchData () {
+        
+        //var query = movies as! PFQuery
+        
+        if searchBar.text != nil {
+         //   query.whereKey("title", containsString: searchBar.text?.lowercaseString)
+            
+            
+        }
+        
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
         let request = NSURLRequest(URL: url!)
@@ -67,6 +79,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource {
                     }
                 }
         });
+        self.filteredData = self.movies
         task.resume()
         
     }
@@ -109,6 +122,23 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource {
         
         detailMovieViewController.performSegueWithIdentifier("DetailMovie", sender: self)
     }
+    
+    func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+        
+        // Dismiss the keyboard
+        searchBar.resignFirstResponder()
+        
+        // Reload of table data
+    
+    }
+    
+//    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+//        filteredData = searchText.isEmpty ? movies : movies.filter({(dataString: String) -> Bool in
+//            return dataString.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+//        })
+//    
+//        collectionView.reloadData()
+//    }
     
     func delay(delay:Double, closure:()->()) {
         dispatch_after(

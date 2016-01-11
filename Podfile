@@ -6,6 +6,8 @@ use_frameworks!
 target 'MovieViewr' do
 
 pod 'AFNetworking'
+pod 'Parse'
+pod 'EZLoadingActivity'
 
 end
 

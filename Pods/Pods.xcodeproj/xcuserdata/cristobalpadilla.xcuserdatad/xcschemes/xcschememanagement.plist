@@ -9,6 +9,21 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>Bolts.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>EZLoadingActivity.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Parse.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-MovieViewr.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -22,7 +37,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>5D99A678B59DF79CE42158B65E29CEF2</key>
+		<key>27FC6531DCF22919D1AE0CB754AAE4B2</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>708E01B006A9F88B3C13711562282B5E</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -32,7 +52,7 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>ED0C2BBF53E030BA42B66AF803B56D45</key>
+		<key>B0214E86E9E229E292863BC821997C4D</key>
 		<dict>
 			<key>primary</key>
 			<true/>
