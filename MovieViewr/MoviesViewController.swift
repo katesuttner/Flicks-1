@@ -20,6 +20,9 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     var movies: [NSDictionary]!
     var filteredData: [NSDictionary]!
     var refreshControl: UIRefreshControl!
+    var searchActive: Bool = false
+    var firstLoad: Bool = true
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,6 +40,15 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         refreshControl = UIRefreshControl()
         self.collectionView.addSubview(self.refreshControl)
         self.refreshControl.addTarget(self, action: "onRefresh", forControlEvents: UIControlEvents.ValueChanged)
+        
+        if firstLoad {
+            UIView.animateWithDuration((1), animations: {
+                self.view.alpha = 0
+                self.view.alpha = 1
+            })
+            firstLoad = false
+            
+        }
 
     }
     
@@ -48,14 +60,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     
     
     func fetchData () {
-        
-        //var query = movies as! PFQuery
-        
-        if searchBar.text != nil {
-         //   query.whereKey("title", containsString: searchBar.text?.lowercaseString)
-            
-            
-        }
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
@@ -90,7 +94,10 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     }
 
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let movies = movies {
+        if searchActive {
+            return filteredData.count
+            
+        } else if let movies = movies {
             return movies.count
             
         } else {
@@ -101,17 +108,24 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
-        let movie = movies![indexPath.row]
+        var movie = NSDictionary()
+        
+        if searchActive {
+            movie = filteredData![indexPath.row]
+            
+        } else {
+            movie = movies![indexPath.row]
+            
+        }
         let title = movie["title"] as! String
         let baseURL = "http://image.tmdb.org/t/p/w500"
         
         if let posterPath = movie["poster_path"] as? String {
             let imageURL = NSURL(string: baseURL + posterPath)
             cell.posterImage.setImageWithURL((imageURL)!)
+            
         }
         cell.titleLabel.text = title
-        
-        
         return cell
     }
     
@@ -133,13 +147,17 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     }
     
 //    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-//        filteredData = searchText.isEmpty ? movies : movies.filter({(dataString: String) -> Bool in
-//            return dataString.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+//        filteredData = filteredData.filter({ (text) -> Bool in
+//            let tmp: NSDictionary = text
+//            
+//        
+//        
+//        
 //        })
 //    
 //        collectionView.reloadData()
 //    }
-    
+
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
             dispatch_time(

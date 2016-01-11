@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MovieViewr/MoviesViewController.swift"
-            timestampString = "474239473.128494"
+            timestampString = "474248797.697031"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "188"
+            endingLineNumber = "188"
             landmarkName = "prepareForSegue(_:sender:)"
             landmarkType = "5">
          </BreakpointContent>
@@ -185,13 +185,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MovieViewr/MoviesViewController.swift"
-            timestampString = "474241419.460782"
+            timestampString = "474242098.517182"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
-            landmarkName = "fetchData()"
-            landmarkType = "5">
+            startingLineNumber = "14"
+            endingLineNumber = "14"
+            landmarkName = "MoviesViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
