@@ -13,6 +13,7 @@ import EZLoadingActivity
 class MoviesViewController: UIViewController, UICollectionViewDataSource {
 
     @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     // Instance Variables
     var movies: [NSDictionary]!
@@ -22,6 +23,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        self.searchBar.barTintColor = UIColor.blackColor()
+        navigationController?.navigationBar.barStyle = UIBarStyle.BlackOpaque
         collectionView.dataSource = self
         
         EZLoadingActivity.show("Loading...", disableUI: true)
@@ -141,8 +144,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource {
                     let imageURL = NSURL(string: baseURL + posterPath)
                     detailMovieViewController.posterImageURL = imageURL!
                 }
-                print(title)
-                print(indexPath)
             }
         }
     }

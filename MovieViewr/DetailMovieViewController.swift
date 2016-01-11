@@ -21,12 +21,12 @@ class DetailMovieViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Do any additional setup after loading the view.
         
         self.posterImage.setImageWithURL(posterImageURL)
         self.titleLabel.text = movieTitle
         self.overviewLabel.text = overview
 
-        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
