@@ -18,11 +18,13 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     
     // Instance Variables
     var movies: [NSDictionary]!
+    var trailers: [NSDictionary]!
+    var trailerKeys: [String]!
+    var movieIDs: [String]!
     var filteredData: [NSDictionary]!
     var refreshControl: UIRefreshControl!
     var searchActive: Bool = false
     var firstLoad: Bool = true
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +36,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         searchBar.delegate = self
         
         EZLoadingActivity.show("Loading...", disableUI: true)
-        fetchData()
+        fetchMovies()
         delay(0.50,closure: {EZLoadingActivity.hide()})
         
         refreshControl = UIRefreshControl()
@@ -58,7 +60,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         
     }
     
-    func fetchData () {
+    func fetchMovies () -> () {
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
@@ -75,7 +77,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
                             //NSLog("\n\nresponse: \(responseDictionary)")
-                            
+                        
                             self.movies = (responseDictionary["results"] as! [NSDictionary])
                             self.collectionView.reloadData()
                             
@@ -86,7 +88,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         task.resume()
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -97,13 +99,32 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
             return filteredData.count
             
         } else if let movies = movies {
+            getMovieIDs(movies.count)
             return movies.count
             
         } else {
             return 0
             
         }
+        
     }
+    
+    func getMovieIDs (numMovies: Int) -> () {
+        
+        var idTempArray = [String]()
+        
+        for i in 0 ... 19 {
+            
+            let movie = self.movies[i]
+            let id = String(movie["id"] as! NSInteger)
+            idTempArray.append(id)
+            movieIDs = idTempArray
+            
+        }
+        print("movieIDs Array Size " + String(movieIDs.count))
+        
+    }
+    
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
@@ -132,7 +153,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         print("Selected cell number: \(indexPath.row)")
         
         let detailMovieViewController = DetailMovieViewController()
-        
         detailMovieViewController.performSegueWithIdentifier("DetailMovie", sender: self)
     }
     
@@ -145,18 +165,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     
     }
     
-//    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-//        filteredData = filteredData.filter({ (text) -> Bool in
-//            let tmp: NSDictionary = text
-//            
-//        
-//        
-//        
-//        })
-//    
-//        collectionView.reloadData()
-//    }
-
     func delay(delay:Double, closure:()->()) {
         dispatch_after(
             dispatch_time(
@@ -168,7 +176,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     
     func onRefresh() {
         delay(2, closure: {
-            self.fetchData()
+            self.fetchMovies()
+
             self.refreshControl.endRefreshing()
         })
         
@@ -177,10 +186,11 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
         if let indexPath = getIndexPathOfSelectedCell() {
+
             let movie = movies![indexPath.row]
             let title = movie["title"] as! String
             let overview = movie["overview"] as! String
-            let baseURL = "http://image.tmdb.org/t/p/w500"
+            let basePosterURL = "http://image.tmdb.org/t/p/w500"
             
             if segue.identifier == "DetailMovie" {
                 let detailMovieViewController = segue.destinationViewController as! DetailMovieViewController
@@ -188,8 +198,12 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
                 detailMovieViewController.overview = overview
                 
                 if let posterPath = movie["poster_path"] as? String {
-                    let imageURL = NSURL(string: baseURL + posterPath)
+                    let imageURL = NSURL(string: basePosterURL + posterPath)
+                    print("row: " + String(indexPath.row))
+                    let movieID = movieIDs[indexPath.row]
                     detailMovieViewController.posterImageURL = imageURL!
+                    detailMovieViewController.movieID = movieID
+                    
                 }
             }
         }
@@ -206,4 +220,5 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         return indexPath
         
     }
+    
 }
