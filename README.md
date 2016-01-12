@@ -23,7 +23,7 @@ The following **optional** features are implemented:
 
 The following **additional** features are implemented:
 
-- [ ] Added a webView so user can see the movie trailer, if available. 
+- [X] Added a webView so user can see the movie trailer, if available. 
 
 ## Video Walkthrough 
 
