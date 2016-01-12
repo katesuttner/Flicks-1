@@ -58,7 +58,6 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         
     }
     
-    
     func fetchData () {
         
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
