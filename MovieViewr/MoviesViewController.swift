@@ -35,9 +35,7 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
         collectionView.dataSource = self
         searchBar.delegate = self
         
-        EZLoadingActivity.show("Loading...", disableUI: true)
         fetchMovies()
-        delay(0.50,closure: {EZLoadingActivity.hide()})
         
         refreshControl = UIRefreshControl()
         self.collectionView.addSubview(self.refreshControl)
@@ -62,6 +60,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
     
     func fetchMovies () -> () {
         
+        EZLoadingActivity.show("Loading...", disableUI: true)
+        
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
         let request = NSURLRequest(URL: url!)
@@ -77,6 +77,8 @@ class MoviesViewController: UIViewController, UICollectionViewDataSource, UISear
                     if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                         data, options:[]) as? NSDictionary {
                             //NSLog("\n\nresponse: \(responseDictionary)")
+                            
+                            self.delay(0.50,closure: {EZLoadingActivity.hide(success: true, animated: true)})
                         
                             self.movies = (responseDictionary["results"] as! [NSDictionary])
                             self.collectionView.reloadData()

@@ -24,7 +24,28 @@ class DetailMovieViewController: UIViewController, UIScrollViewDelegate {
     var posterImageURL: NSURL = NSURL(fileURLWithPath: " ")
     var trailerURLString: String = "https://www.youtube.com/embed/oAPjTHA19Kw"   // Originally defaulted to "Go", by Valley Lodge
     var movieID: String = " "
-
+    
+//    @IBDesignable class TopAlignedLabel: UILabel {
+//        override func drawTextInRect(rect: CGRect) {
+//            if let stringText = text {
+//                let stringTextAsNSString = stringText as NSString
+//                var labelStringSize = stringTextAsNSString.boundingRectWithSize(CGSizeMake(CGRectGetWidth(self.frame), CGFloat.max),
+//                    options: NSStringDrawingOptions.UsesLineFragmentOrigin,
+//                    attributes: [NSFontAttributeName: font],
+//                    context: nil).size
+//                super.drawTextInRect(CGRectMake(0, 0, CGRectGetWidth(self.frame), ceil(labelStringSize.height)))
+//            } else {
+//                super.drawTextInRect(rect)
+//            }
+//    }
+//        
+//        override func prepareForInterfaceBuilder() {
+//            super.prepareForInterfaceBuilder()
+//            layer.borderWidth = 1
+//            layer.borderColor = UIColor.blackColor().CGColor
+//        }
+//    }
+//
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -32,8 +53,10 @@ class DetailMovieViewController: UIViewController, UIScrollViewDelegate {
         self.posterImage.setImageWithURL(posterImageURL)
         self.titleLabel.text = movieTitle
         self.overviewLabel.text = overview
-        scrollView.contentSize.height = 1010
+        scrollView.contentSize.height = 1000
         webView.backgroundColor = UIColor.blackColor()
+        //scrollView.sizeToFit()
+        overviewLabel.sizeToFit()
         
         fetchTrailerURLString()
     }
@@ -45,6 +68,7 @@ class DetailMovieViewController: UIViewController, UIScrollViewDelegate {
     
     func fetchTrailerURLString () -> () {
         
+        EZLoadingActivity.show("Loading...", disableUI: true)
         let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
         let baseTrailerURL = "https://www.youtube.com/embed/"
         
@@ -63,6 +87,8 @@ class DetailMovieViewController: UIViewController, UIScrollViewDelegate {
                         data2, options:[]) as? NSDictionary {
                             //NSLog("\n\nresponse2: \(responseDictionary2)")
                             
+                            self.delay(0.50,closure: {EZLoadingActivity.hide(success: true, animated: true)})
+                            
                             self.trailers = (responseDictionary2["results"] as! [NSDictionary])
                             
                             if self.trailers.count > 0 {
@@ -74,10 +100,9 @@ class DetailMovieViewController: UIViewController, UIScrollViewDelegate {
                                 }
                             }
                             
-                            EZLoadingActivity.show("Loading...", disableUI: true)
-                            let trailerWebFrame = "<iframe width=\"305\" height=\"220\" src=\"\(self.trailerURLString)\" frameborder=\"0\" allowfullscreen></iframe>"
+                            
+                            let trailerWebFrame = "<iframe width=\"323\" height=\"245\" src=\"\(self.trailerURLString)\" marginheight=\"0\" marginwidth=\"0\" frameborder=\"0\" allowfullscreen></iframe>"
                             self.webView.loadHTMLString(trailerWebFrame, baseURL: nil)
-                            self.delay(0.50,closure: {EZLoadingActivity.hide()})
                     }
                 }
         });
